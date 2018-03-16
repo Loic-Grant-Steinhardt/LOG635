@@ -1,9 +1,14 @@
 import json
+from tkinter import filedialog
+from tkinter import *
+
+root = Tk()
+root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Sélectionner les données",filetypes = (("Données","*.csv"),("jpeg files","*.jpg")))
+root.destroy()
+#print (root.filename)
 
 file_txt = open("Dataset.csv",'r').read()
 set(w.lower() for w in file_txt)
-
-#print(file_txt)
 
 headers = []
 datas = []
@@ -30,4 +35,4 @@ print(str(len(datas)) + " entrées")
 # Exemple accéder à une entrée : datas[index]['Pays']
 
 '''for index, data in enumerate(datas):
-    print(datas[index][2])'''
+    print(datas[index]['Id'])'''
