@@ -1,6 +1,12 @@
 import json
+from tkinter import filedialog
+from tkinter import *
+ 
+root = Tk()
+root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Sélectionner les données",filetypes = (("Données","*.csv"),("jpeg files","*.jpg")))
+print (root.filename)
 
-file_txt = open("Dataset.csv",'r').read()
+file_txt = open(root.filename,'r').read()
 set(w.lower() for w in file_txt)
 
 #print(file_txt)
