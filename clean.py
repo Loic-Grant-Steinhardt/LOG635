@@ -18,10 +18,16 @@ for index, line in enumerate(file_txt.split("\n")):
         del split[-1]
         if (len(headers) > 0):
             for col, value in enumerate(split):
-                data["" + headers[col]] = value.strip()
+                header = "" + headers[col]
+                value = value.strip()
+                
+                data[header] = value
             datas.insert(len(datas) - 1, data);
 
 
 print(str(len(datas)) + " entrées")
 
 # Exemple accéder à une entrée : datas[index]['Pays']
+
+'''for index, data in enumerate(datas):
+    print(datas[index][2])'''
