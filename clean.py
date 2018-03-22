@@ -59,14 +59,21 @@ for index, line in enumerate(lines):
         del split[-1]
         if (len(headers) > 0):
             for col, value in enumerate(split):
+                valeurAberrante = False
                 header = "" + headers[col]
                 value = value.strip()
+
+                # Élimination des valeurs aberrantes
+                # Age impossible
+                if(header == "Age" and value == "25-34"): # Définir en valeur numérique
+                  valeurAberrante = True
+                  break
 
                 # Enlever les pourcentages (%)
                 if value.find("%") != -1 :
                     value = value.replace("%", "")
 
-                # si la valeur est numerique
+                # Si la valeur est numerique
                 if(isfloat(value)):
                   currentMin = minMax[header]['min']
                   currentMax = minMax[header]['max']
@@ -80,10 +87,10 @@ for index, line in enumerate(lines):
                     minMax[header]['max'] = float(value)
                   elif(float(value) > currentMax):
                     minMax[header]['max'] = float(value)
-
-                data[header] = value
-            datas.insert(len(datas) - 1, data);
-
+                
+                data[header] = value     
+            if not valeurAberrante :
+              datas.insert(len(datas) - 1, data);
 
 
 # Ajuster les valeurs entre 0 et 1
@@ -96,8 +103,9 @@ for i, data in enumerate(datas):
     if(minValue is not None and maxValue is not None):
       etendu = maxValue - minValue
       currentValue = float(data[header])
-      newValue = (currentValue - minValue) / etendu
+      newValue = (currentValue - minValue) / etendu # Division par zéro possible
       datas[i][header] = newValue
 
 # Affichage console
-print(str(len(datas)) + " entrées")
+for i, data in enumerate(datas):
+  print(str(data) + " ")
