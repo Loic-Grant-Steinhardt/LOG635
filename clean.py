@@ -61,9 +61,16 @@ for index, line in enumerate(lines):
         del split[-1]
         if (len(headers) > 0):
             for col, value in enumerate(split):
+                valeurAberrante = False
                 header = "" + headers[col]
                 value = value.strip()
 
+                # Élimination des valeurs aberrantes
+                # Age impossible
+                if(header == "Age" and value == "25-34"): # Définir en valeur numérique
+                  valeurAberrante = True
+                  break
+                
                 # Enlever les pourcentages (%)
                 if value.find("%") != -1 :
                     value = value.replace("%", "")
@@ -84,7 +91,8 @@ for index, line in enumerate(lines):
                     minMax[header]['max'] = float(value)
             
                 data[header] = value
-            datas.insert(len(datas) - 1, data);
+            if not valeurAberrante :
+                datas.insert(len(datas) - 1, data);
 
 
 print(minMax)
