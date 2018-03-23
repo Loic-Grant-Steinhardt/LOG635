@@ -67,9 +67,10 @@ for index, line in enumerate(lines):
 
                 # Élimination des valeurs aberrantes
                 # Age impossible
-                if(header == "Age" and value == "25-34"): # Définir en valeur numérique
-                  valeurAberrante = True
-                  break
+                if(header == "Age"):
+                  if(value not in ageMultiplier):
+                    valeurAberrante = True
+                    break
                 
                 # Enlever les pourcentages (%)
                 if value.find("%") != -1 :
@@ -94,8 +95,6 @@ for index, line in enumerate(lines):
             if not valeurAberrante :
                 datas.insert(len(datas) - 1, data);
 
-
-print(minMax)
 
 '''
 Ajuster les valeurs entre 0 et 1
