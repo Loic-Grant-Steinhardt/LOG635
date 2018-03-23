@@ -1,12 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*
+
 import json
 from tkinter import filedialog
 from tkinter import *
+
 
 '''root = Tk()
 root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Sélectionner les données",filetypes = (("Données","*.csv"),("jpeg files","*.jpg")))
 root.destroy()'''
 
-file_txt = open("Dataset.csv",'r').read()
+file_txt = open("Dataset.csv", "r", -1, "utf-8").read()
 set(w.lower() for w in file_txt)
 
 headers = []
@@ -30,7 +34,7 @@ headers = lines[0].split(',')
 indexId = headers.index("Id")
 del headers[indexId]
 
-IndexEthni = headers.index("EthnicitÃ©")
+IndexEthni = headers.index("Ethnicité")
 del headers[IndexEthni]
 
 for value in headers:
@@ -78,14 +82,15 @@ for index, line in enumerate(lines):
                     minMax[header]['max'] = float(value)
                   elif(float(value) > currentMax):
                     minMax[header]['max'] = float(value)
-
+            
                 data[header] = value
             datas.insert(len(datas) - 1, data);
 
 
-
-# Ajuster les valeurs entre 0 et 1
-# Selon la méthode avec l'étendu
+'''
+Ajuster les valeurs entre 0 et 1
+Selon la méthode avec l'étendu
+'''
 for i, data in enumerate(datas):
   for j, header in enumerate(data):
     minValue = minMax[''+header]['min']
