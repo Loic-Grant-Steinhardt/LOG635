@@ -148,7 +148,12 @@ for i, data in enumerate(datas):
     if(minValue is not None and maxValue is not None):
       etendu = maxValue - minValue
       currentValue = float(data[header])
-      newValue = (currentValue - minValue) / etendu
+      if(etendu == 0):
+        print("ZUT! ")
+        newValue = 0
+      else:
+        newValue = (currentValue - minValue) / etendu
+        print("COOL! ")
       datas[i][header] = newValue
 
 # Affichage console
