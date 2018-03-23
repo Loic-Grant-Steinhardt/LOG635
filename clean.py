@@ -38,6 +38,8 @@ paysMultiplier = {
     "Canada": 0,
     "Australie": 0,
     "Autre": 0,
+    "Nouvelle Zelande": 0,
+    "Republique d'Ireland": 0,    
 }
 
 educationMultiplier = {
@@ -149,11 +151,9 @@ for i, data in enumerate(datas):
       etendu = maxValue - minValue
       currentValue = float(data[header])
       if(etendu == 0):
-        print("ZUT! ")
         newValue = 0
       else:
         newValue = (currentValue - minValue) / etendu
-        print("COOL! ")
       datas[i][header] = newValue
 
 # Affichage console
