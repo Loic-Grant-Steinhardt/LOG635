@@ -27,6 +27,19 @@ ageMultiplier = {
     "65+": 1.00
 }
 
+genreMultiplier = {
+    "Male": 1,
+    "Female": 0,
+}
+
+paysMultiplier = {
+    "UK": 0,
+    "USA": 0,
+    "Canada": 0,
+    "Australie": 0,
+    "Autre": 0,
+}
+
 educationMultiplier = {
   "Doctorat" : 0,
   "Matrise" : 0,
@@ -88,6 +101,16 @@ for index, line in enumerate(lines):
                   if(value not in educationMultiplier):
                     valeurAberrante = True
                     break
+                # Genre impossible
+                if(header == "Genre"):
+                  if(value not in genreMultiplier):
+                    valeurAberrante = True
+                    break
+                # Pays impossible
+                if(header == "Pays"):
+                  if(value not in paysMultiplier):
+                    valeurAberrante = True
+                    break
                     
                 # Enlever les pourcentages (%)
                 if value.find("%") != -1 :
@@ -129,4 +152,6 @@ for i, data in enumerate(datas):
       datas[i][header] = newValue
 
 # Affichage console
-print(str(len(datas)) + " entrées")
+#print(str(len(datas)) + " entrées")
+for i, data in enumerate(datas):
+  print(str(data) + " ")
