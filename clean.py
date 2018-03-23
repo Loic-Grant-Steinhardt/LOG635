@@ -27,6 +27,18 @@ ageMultiplier = {
     "65+": 1.00
 }
 
+educationMultiplier = {
+  "Doctorat" : 0,
+  "Matrise" : 0,
+  "À quitté l'école à 18 ans" : 0,
+  "À quitté l'école à 16 ans" : 0,
+  "Université" : 0,
+  "Collège ou université aucun certificat ou diplome" : 0,
+  "À quitté l'école avant 16 ans" : 0,
+  "À quitté l'école à 17 ans" : 0,
+  "Certificat ou diplome professionel" : 0
+}
+
 lines = file_txt.split("\n")
 headers = lines[0].split(',')
 
@@ -71,7 +83,12 @@ for index, line in enumerate(lines):
                   if(value not in ageMultiplier):
                     valeurAberrante = True
                     break
-                
+                # Education impossible
+                if(header == "Education"):
+                  if(value not in educationMultiplier):
+                    valeurAberrante = True
+                    break
+                    
                 # Enlever les pourcentages (%)
                 if value.find("%") != -1 :
                     value = value.replace("%", "")
@@ -94,7 +111,6 @@ for index, line in enumerate(lines):
                 data[header] = value
             if not valeurAberrante :
                 datas.insert(len(datas) - 1, data);
-
 
 '''
 Ajuster les valeurs entre 0 et 1
