@@ -13,7 +13,6 @@ headers = lines[0].split(',')
 file_txt = open("Evaluations.csv", "r", -1, "utf-8").read()
 set(w.lower() for w in file_txt)
 lines2 = file_txt.split("\n")
-headers2 = lines2[0].split(',')
           
 # Élimination de certaines valeurs
 indexId = headers.index("Id")
@@ -157,8 +156,11 @@ def createDataset(lines, isTraining):
       del row[-1]
       valeurAberrante = False
 
-      # Conserver la valeur de la Nicotine
-      nicotineValue = float(row[indexNicotine])
+      # Mettre Nicotine à la fin
+      if(isTraining):
+        nicotineValue = row[indexNicotine]
+        row.pop(indexNicotine)
+        row.insert(len(row), nicotineValue)
       
       # Loop sur chaque valeur d'une ligne
       for col, value in enumerate(row):
@@ -216,27 +218,6 @@ def createDataset(lines, isTraining):
             value = paysMultiplier[value]
             row[col] = value
 
-        # Retirer 'Nicotine' de la row
-        if(col == indexNicotine):
-          value = float(value)
-
-          '''# Un peu sketch mais ca va pour l'instant
-          currentMin = minMax['Nicotine']['min']
-          currentMax = minMax['Nicotine']['max']
-
-          if(currentMin is None):
-            minMax['Nicotine']['min'] = float(value)
-          elif(float(value) < currentMin):
-            minMax['Nicotine']['min'] = float(value)
-
-          if(currentMax is None):
-            minMax['Nicotine']['max'] = float(value)
-          elif(float(value) > currentMax):
-            minMax['Nicotine']['max'] = float(value)'''
-          
-          row.pop(col)
-          #break
-
         # Si la valeur est numerique
         if(isfloat(value)):
           # Convertir string en float
@@ -259,11 +240,8 @@ def createDataset(lines, isTraining):
 
       # Ajouter la valeur si elle n'est pas aberrante
       if not valeurAberrante:
-        # Mettre 'Nicotine' à la fin
-        row.insert(len(row), nicotineValue)
-
         # Ajouter les données au dataset
-        datas.insert(len(datas) - 1, row)
+        datas.insert(len(datas), row)
 
   # Retourner le dataset
   return datas
@@ -271,23 +249,27 @@ def createDataset(lines, isTraining):
 
 # Training set
 dataset = createDataset(lines, True)
-#dataset = ajustValues(dataset)
+dataset = ajustValues(dataset)
 
 # Evaluation set
 evalSet = createDataset(lines2, False)
-#evalSet = ajustValues(evalSet)
+evalSet = ajustValues(evalSet)
 
-'''print("Training set length   : " + str(len(dataset)) + " entries")
-print("Evaluation set length : " + str(len(evalSet)) + " entries")'''
+print("Training set length   : " + str(len(dataset)) + " entries")
+print("Evaluation set length : " + str(len(evalSet)) + " entries")
+print("")
 
 predictions=[]
 k = 3
+
+print("Prédictions")
+print("-----------------------------------")
 
 for x in range(len(evalSet)):
   neighbors = getNeighbors(dataset, evalSet[x], k)
   result = getResponse(neighbors)
   predictions.append(result)
-  print('> predicted=' + repr(result) + ', actual=' + repr(evalSet[x][-1]))
+  print('> predicted = ' + repr(result) + ', actual=' + repr(evalSet[x][-1]))
   
 accuracy = getAccuracy(evalSet, predictions)
-print('Accuracy: ' + repr(accuracy) + '%')
+print('> ACCURACY  = ' + repr(accuracy) + '%')
