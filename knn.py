@@ -103,7 +103,7 @@ def plusProchesVoisins(dataset, evalSet, k):
     distances.append((dataset[x], dist))
 
   # Trier les valeurs
-  distances.sort(key=operator.itemgetter(1))
+  distances.sort(key = operator.itemgetter(1))
 
   # Retourner les voisins en ordre du plus proche
   for x in range(k):
@@ -270,28 +270,31 @@ def createDataset(lines, isTraining):
 
 # Training set
 dataset = createDataset(lines, True)
-#dataset = ajustValues(dataset)
+dataset = ajustValues(dataset)
 
 # Evaluation set
 evalSet = createDataset(lines2, False)
-#evalSet = ajustValues(evalSet)
+evalSet = ajustValues(evalSet)
 
 print("Training set length   : " + str(len(dataset)) + " entries")
 print("Evaluation set length : " + str(len(evalSet)) + " entries")
 print("")
 
 predictions = []
-k = 1
+k = 2
 
 print("Prédictions")
-print("-----------------------------------")
+print("*************************************")
+print("")
 
 # Parcourir evalSet
 for x in range(len(evalSet)):
   voisins = plusProchesVoisins(dataset, evalSet[x], k)
   prediction = getPrediction(voisins)
   predictions.insert(len(predictions), prediction)
-  print('> predicted = ' + repr(prediction) + ', actual=' + repr(evalSet[x][-1]))
+  
+  print(' Prédiction = ' + repr(prediction) + ', Valeur = ' + repr(evalSet[x][-1]))
   
 accuracy = evalPrecision(evalSet, predictions)
-print('> ACCURACY  = ' + repr(accuracy) + '%')
+print("-------------------------------------")
+print(' ACCURACY  = ' + repr(accuracy) + '%')
