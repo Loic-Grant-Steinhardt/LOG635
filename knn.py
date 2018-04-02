@@ -82,41 +82,62 @@ def isfloat(value):
   except ValueError:
     return False
 
-def euclideanDistance(instance1, instance2, length):
-  distance = 0
+def calculerDistance(first, second, length):
+  dist = 0
+  exp = 2
+
+  # Parcours des attributs et incrémentation
   for x in range(length):
-    distance += pow((instance1[x] - instance2[x]), 2)
-  return math.sqrt(distance)
+    dist = dist + pow((first[x] - second[x]), exp)
+    
+  return math.sqrt(dist)
 
-def getNeighbors(dataset, testInstance, k):
+def plusProchesVoisins(dataset, evalSet, k):
+  voisins = []
   distances = []
-  length = len(testInstance)-1
+  length = len(evalSet) - 1
+
+  # Parcourir le dataset
   for x in range(len(dataset)):
-    dist = euclideanDistance(testInstance, dataset[x], length)
+    dist = calculerDistance(evalSet, dataset[x], length)
     distances.append((dataset[x], dist))
+
+  # Trier les valeurs
   distances.sort(key=operator.itemgetter(1))
-  neighbors = []
+
+  # Retourner les voisins en ordre du plus proche
   for x in range(k):
-    neighbors.append(distances[x][0])
-  return neighbors
+    voisins.append(distances[x][0])
+    
+  return voisins
 
-def getResponse(neighbors):
-  classVotes = {}
-  for x in range(len(neighbors)):
-    response = neighbors[x][-1]
-    if response in classVotes:
-      classVotes[response] += 1
+def getPrediction(voisins):
+  attributs = {}
+
+  # Parcourir chaque attribut
+  for i in range(len(voisins)):
+    attribut = voisins[i][-1]
+    
+    if attribut in attributs:
+      attributs[attribut] = attributs[attribut] + 1
     else:
-      classVotes[response] = 1
-  sortedVotes = sorted(classVotes.items(), key=operator.itemgetter(1), reverse=True)
-  return sortedVotes[0][0]
+      attributs[attribut] = 1
+      
+  attributsTrie = sorted(attributs.items(), key = operator.itemgetter(1), reverse = True)
+  return attributsTrie[0][0]
 
-def getAccuracy(evalSet, predictions):
-  correct = 0
+# Evaluation de la precision des predictions
+def evalPrecision(evalSet, predictions):
+  pareil = 0
+
+  # Parcourir evalSet
   for x in range(len(evalSet)):
+    # Si la valeur du dernier attribut est égale à la valeur prédite
     if evalSet[x][-1] == predictions[x]:
-      correct += 1
-  return (correct/float(len(evalSet))) * 100.0
+      pareil += 1
+
+  pourcentage = (pareil / float(len(evalSet))) * 100.0
+  return pourcentage
 
 # Ajuster les valeurs entre 0 et 1 selon la méthode avec l'étendu
 def ajustValues(datas):
@@ -249,27 +270,28 @@ def createDataset(lines, isTraining):
 
 # Training set
 dataset = createDataset(lines, True)
-dataset = ajustValues(dataset)
+#dataset = ajustValues(dataset)
 
 # Evaluation set
 evalSet = createDataset(lines2, False)
-evalSet = ajustValues(evalSet)
+#evalSet = ajustValues(evalSet)
 
 print("Training set length   : " + str(len(dataset)) + " entries")
 print("Evaluation set length : " + str(len(evalSet)) + " entries")
 print("")
 
-predictions=[]
-k = 3
+predictions = []
+k = 1
 
 print("Prédictions")
 print("-----------------------------------")
 
+# Parcourir evalSet
 for x in range(len(evalSet)):
-  neighbors = getNeighbors(dataset, evalSet[x], k)
-  result = getResponse(neighbors)
-  predictions.append(result)
-  print('> predicted = ' + repr(result) + ', actual=' + repr(evalSet[x][-1]))
+  voisins = plusProchesVoisins(dataset, evalSet[x], k)
+  prediction = getPrediction(voisins)
+  predictions.insert(len(predictions), prediction)
+  print('> predicted = ' + repr(prediction) + ', actual=' + repr(evalSet[x][-1]))
   
-accuracy = getAccuracy(evalSet, predictions)
+accuracy = evalPrecision(evalSet, predictions)
 print('> ACCURACY  = ' + repr(accuracy) + '%')
