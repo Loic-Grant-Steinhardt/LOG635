@@ -3,42 +3,16 @@ import csv
 import random
 import math
 import operator
-import json
-from tkinter import filedialog
-from tkinter import *
-import ctypes
-from ctypes.wintypes import HWND, LPWSTR, UINT
 
-def Mbox(title, text, style):
-    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
+# Lire les fichiers
+file_txt = open("Dataset.csv", "r", -1, "utf-8").read()
+set(w.lower() for w in file_txt)
+lines = file_txt.split("\n")
+headers = lines[0].split(',')
 
-IDYES = 6
-IDNO = 7
-
-choix = Mbox('Algo KNN', 'Voulez-vous importer un seul fichier ?', 4)
-
-if choix==IDNO:
-  # Lire les fichiers
-  root = Tk()
-  root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Sélectionner les données",filetypes = (("Données","*.csv"),("jpeg files","*.jpg")))
-  file_txt = open(root.filename, "r", -1, "utf-8").read()
-  set(w.lower() for w in file_txt)
-  lines = file_txt.split("\n")
-  headers = lines[0].split(',')
-
-  root = Tk()
-  root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Sélectionner les données",filetypes = (("Données","*.csv"),("jpeg files","*.jpg")))
-  file_txt = open(root.filename, "r", -1, "utf-8").read()
-  set(w.lower() for w in file_txt)
-  lines2 = file_txt.split("\n")
-  
-elif choix==IDYES:
-  root = Tk()
-  root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Sélectionner les données",filetypes = (("Données","*.csv"),("jpeg files","*.jpg")))
-  file_txt = open(root.filename, "r", -1, "utf-8").read()
-  set(w.lower() for w in file_txt)
-  lines = file_txt.split("\n")
-  headers = lines[0].split(',')
+file_txt = open("Evaluations.csv", "r", -1, "utf-8").read()
+set(w.lower() for w in file_txt)
+lines2 = file_txt.split("\n")
           
 # Élimination de certaines valeurs
 indexId = headers.index("Id")
@@ -99,8 +73,6 @@ ethniciteMultiplier = {
     "Noir": 5,
     "Autre": 6
 }
-
-
 
 # Détermine si une valeur est numérique
 def isfloat(value):
@@ -305,13 +277,10 @@ def createDataset(lines, isTraining):
 
 # Training set
 dataset = createDataset(lines, True)
-if choix == IDYES :
-  evalSet = dataset[int(2*len(dataset)/3):]
-  dataset = dataset[:int(len(dataset)/3)]
-elif choix == IDNO :
-  evalSet = createDataset(lines2, False)
-
 dataset = ajustValues(dataset)
+
+# Evaluation set
+evalSet = createDataset(lines2, False)
 evalSet = ajustValues(evalSet)
 
 # AFfichage
