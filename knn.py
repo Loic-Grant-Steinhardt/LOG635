@@ -34,12 +34,12 @@ for value in headers:
 
 # Multipliers
 ageMultiplier = {
-    "18-24": 0.17,
-    "25-34": 0.34,
-    "35-44": 0.51,
-    "45-54": 0.68,
-    "55-64": 0.85,
-    "65+": 1.00
+    "18-24": 1,
+    "25-34": 2,
+    "35-44": 3,
+    "45-54": 4,
+    "55-64": 5,
+    "65+": 6
 }
 genreMultiplier = {
     "Male": 1,
@@ -55,23 +55,23 @@ paysMultiplier = {
     "Republique d'Ireland": 7,    
 }
 educationMultiplier = {
-  "Doctorat" : 0.11,
-  "Matrise" : 0.22,
-  "Université" : 0.33,
-  "Collège ou université aucun certificat ou diplome" : 0.44,
-  "Certificat ou diplome professionel" : 0.55,
-  "À quitté l'école à 18 ans" : 0.66,
-  "À quitté l'école à 17 ans" : 0.77,
-  "À quitté l'école à 16 ans" : 0.88,
-  "À quitté l'école avant 16 ans" : 1
+  "Doctorat" : 1,
+  "Matrise" : 2,
+  "Université" : 3,
+  "Collège ou université aucun certificat ou diplome" : 4,
+  "Certificat ou diplome professionel" : 5,
+  "À quitté l'école à 18 ans" : 6,
+  "À quitté l'école à 17 ans" : 7,
+  "À quitté l'école à 16 ans" : 8,
+  "À quitté l'école avant 16 ans" : 9
 }
 ethniciteMultiplier = {
-    "Blanc": 0.17,
-    "Mixed-Blanc/Asiatique": 0.34,
-    "Mixed-Blanc/Noir": 0.51,
-    "Asiatique": 0.68,
-    "Noir": 0.85,
-    "Autre": 1.00
+    "Blanc": 1,
+    "Mixed-Blanc/Asiatique": 2,
+    "Mixed-Blanc/Noir": 3,
+    "Asiatique": 4,
+    "Noir": 5,
+    "Autre": 6
 }
 
 # Détermine si une valeur est numérique
@@ -82,6 +82,7 @@ def isfloat(value):
   except ValueError:
     return False
 
+# Calcule de la distance Euclédienne entre deux éléments
 def calculerDistance(first, second, length):
   dist = 0
   exp = 2
@@ -92,6 +93,7 @@ def calculerDistance(first, second, length):
     
   return math.sqrt(dist)
 
+# Déterminer les k plus proches voisins de chaque éléments d'un dataset
 def plusProchesVoisins(dataset, evalSet, k):
   voisins = []
   distances = []
@@ -111,19 +113,24 @@ def plusProchesVoisins(dataset, evalSet, k):
     
   return voisins
 
+# Retourner la préciction de Nicotine basé sur les plus proches voisins
 def getPrediction(voisins):
   attributs = {}
 
   # Parcourir chaque attribut
   for i in range(len(voisins)):
     attribut = voisins[i][-1]
-    
+
+    # Si l'attribut courant se trouve dans la liste d'attributs
     if attribut in attributs:
       attributs[attribut] = attributs[attribut] + 1
     else:
       attributs[attribut] = 1
-      
+
+  # Trier les attributs    
   attributsTrie = sorted(attributs.items(), key = operator.itemgetter(1), reverse = True)
+
+  # Retourner le premier élément dans la liste triée
   return attributsTrie[0][0]
 
 # Evaluation de la precision des predictions
@@ -276,16 +283,17 @@ dataset = ajustValues(dataset)
 evalSet = createDataset(lines2, False)
 evalSet = ajustValues(evalSet)
 
+# AFfichage
 print("Training set length   : " + str(len(dataset)) + " entries")
 print("Evaluation set length : " + str(len(evalSet)) + " entries")
 print("")
 
-predictions = []
-k = 2
-
 print("Prédictions")
 print("*************************************")
 print("")
+
+k = 2
+predictions = []
 
 # Parcourir evalSet
 for x in range(len(evalSet)):
