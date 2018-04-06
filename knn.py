@@ -310,11 +310,11 @@ dataset = createDataset(lines, True)
 evalSet = createDataset(lines2, False)
 #evalSet = ajustValues(evalSet)
 
-evalSetForK = dataset[:len(dataset) / 2]
+evalSetForK = dataset[:int(len(dataset) / 2)]
 
 # Affichage
-print("Training set length   : " + str(len(dataset)) + " entries")
-print("Evaluation set length : " + str(len(evalSet)) + " entries")
+print("Longueur du fichier d'entrainement   : " + str(len(dataset)) + " données")
+print("Longueur du fichier d'évaluation : " + str(len(evalSet)) + " données")
 print("")
 
 print("Évaluation du meilleur K ...")
@@ -332,13 +332,13 @@ if choix2==IDYES:
     showGraph = False
 else:
   # ÉVALUATION DU K IDÉAL
-  for i in range(1, 31):
+  for i in range(32, 50):
     predictions = []
     k = i
     xAxisK.insert(len(xAxisK), k)
     
     for x in range(len(evalSetForK)):
-      voisins = plusProchesVoisins(dataset, evalSetForK[x], k)
+      voisins = plusProchesVoisins(dataset[int(len(dataset) / 2):], evalSetForK[x], k)
       prediction = getPrediction(voisins)
       predictions.insert(len(predictions), prediction)
       
@@ -382,6 +382,7 @@ if(showGraph):
 print("")
 print("Prédictions ...")
 print("-------------------------------------")
+
 
 # ÉVALUATION DU DATASET DE TEST
 predictions = []
