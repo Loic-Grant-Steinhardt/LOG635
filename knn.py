@@ -3,16 +3,41 @@ import csv
 import random
 import math
 import operator
+import plotly.plotly as py
+py.sign_in('loicp', 'uMxNB1jpYtfgk2eW6Y09')
+from plotly.graph_objs import *
+import ctypes
+from ctypes.wintypes import HWND, LPWSTR, UINT
+import pickle
+from tkinter import filedialog
+from tkinter import *
+
+#mdp plotly : steve123
+IDYES = 6
+IDNO = 7
+
+def Mbox(title, text, style):
+    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
+
+
 
 # Lire les fichiers
-file_txt = open("Dataset.csv", "r", -1, "utf-8").read()
+#file_txt = open("Dataset.csv", "r", -1, "utf-8").read()
+root = Tk()
+root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Sélectionner le fichier d'entrainement",filetypes = (("Entrainement","*.csv"),("jpeg files","*.jpg")))
+file_txt = open(root.filename, "r", -1, "utf-8").read()
 set(w.lower() for w in file_txt)
 lines = file_txt.split("\n")
 headers = lines[0].split(',')
+root.destroy()
 
-file_txt = open("Evaluations.csv", "r", -1, "utf-8").read()
+#file_txt = open("Evaluations.csv", "r", -1, "utf-8").read()
+root = Tk()
+root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Sélectionner le fichier d'évaluation",filetypes = (("Évaluation","*.csv"),("jpeg files","*.jpg")))
+file_txt = open(root.filename, "r", -1, "utf-8").read()
 set(w.lower() for w in file_txt)
 lines2 = file_txt.split("\n")
+root.destroy()
           
 # Élimination de certaines valeurs
 indexId = headers.index("Id")
@@ -71,7 +96,8 @@ ethniciteMultiplier = {
     "Mixed-Blanc/Noir": 3,
     "Asiatique": 4,
     "Noir": 5,
-    "Autre": 6
+    "Autre": 6,
+    "Mixed-Noir/Asiatique": 7
 }
 
 # Détermine si une valeur est numérique
@@ -90,7 +116,7 @@ def calculerDistance(first, second, length):
   # Parcours des attributs et incrémentation
   for x in range(length):
     dist = dist + pow((first[x] - second[x]), exp)
-    
+
   return math.sqrt(dist)
 
 # Déterminer les k plus proches voisins de chaque éléments d'un dataset
@@ -98,6 +124,7 @@ def plusProchesVoisins(dataset, evalSet, k):
   voisins = []
   distances = []
   length = len(evalSet) - 1
+  perfectDistance = False
 
   # Parcourir le dataset
   for x in range(len(dataset)):
@@ -115,23 +142,23 @@ def plusProchesVoisins(dataset, evalSet, k):
 
 # Retourner la préciction de Nicotine basé sur les plus proches voisins
 def getPrediction(voisins):
-  attributs = {}
+  nicotines = {}
 
   # Parcourir chaque attribut
   for i in range(len(voisins)):
-    attribut = voisins[i][-1]
+    nicotine = voisins[i][-1]
 
     # Si l'attribut courant se trouve dans la liste d'attributs
-    if attribut in attributs:
-      attributs[attribut] = attributs[attribut] + 1
+    if nicotine in nicotines:
+      nicotines[nicotine] = nicotines[nicotine] + 1
     else:
-      attributs[attribut] = 1
+      nicotines[nicotine] = 1
 
   # Trier les attributs    
-  attributsTrie = sorted(attributs.items(), key = operator.itemgetter(1), reverse = True)
+  nicotinesTrie = sorted(nicotines.items(), key = operator.itemgetter(1), reverse = True)
 
   # Retourner le premier élément dans la liste triée
-  return attributsTrie[0][0]
+  return nicotinesTrie[0][0]
 
 # Evaluation de la precision des predictions
 def evalPrecision(evalSet, predictions):
@@ -277,32 +304,92 @@ def createDataset(lines, isTraining):
 
 # Training set
 dataset = createDataset(lines, True)
-dataset = ajustValues(dataset)
+#dataset = ajustValues(dataset)
 
 # Evaluation set
 evalSet = createDataset(lines2, False)
-evalSet = ajustValues(evalSet)
+#evalSet = ajustValues(evalSet)
 
-# AFfichage
+evalSetForK = dataset[:len(dataset) / 2]
+
+# Affichage
 print("Training set length   : " + str(len(dataset)) + " entries")
 print("Evaluation set length : " + str(len(evalSet)) + " entries")
 print("")
 
-print("Prédictions")
-print("*************************************")
+print("Évaluation du meilleur K ...")
+
+accuracies = []
+xAxis = []
+xAxisK = []
+yAxisK = []
+showGraph = True
+
+choix2 = Mbox('Algo KNN', 'Voulez-vous importer une valeur de K précédemment sauvegardée ?', 4)
+if choix2==IDYES:
+    k = pickle.load( open( "sauvegarde.p", "rb" ) )
+    k = int(k)
+    showGraph = False
+else:
+  # ÉVALUATION DU K IDÉAL
+  for i in range(1, 31):
+    predictions = []
+    k = i
+    xAxisK.insert(len(xAxisK), k)
+    
+    for x in range(len(evalSetForK)):
+      voisins = plusProchesVoisins(dataset, evalSetForK[x], k)
+      prediction = getPrediction(voisins)
+      predictions.insert(len(predictions), prediction)
+      
+    accuracy = evalPrecision(evalSetForK, predictions)
+    accuracies.insert(len(accuracies), accuracy)
+
+    # Arreter l'entrainement si une précision est supérieure à 85%
+    if(accuracy >= 85):
+      break
+
+  # Trouver la meilleur précision
+  index, value = max(enumerate(accuracies), key=operator.itemgetter(1))
+  k = index + 1
+
+print("Le K utilisé sera : " + str(k))
 print("")
 
-k = 2
+choix = Mbox('Algo KNN', 'Voulez-vous sauvegarder la valeur de K ?', 4)
+if choix==IDYES:
+    with open('sauvegarde.p', 'wb') as f:
+        pickle.dump(k, f)
+
+if(showGraph):
+    yAxisK = accuracies
+    traceK = {"x": xAxisK, 
+              "y": yAxisK, 
+              "marker": {"color": "red", "size": 12}, 
+              "mode": "markers", 
+              "name": "K", 
+              "type": "scatter"
+    }
+    data = Data([traceK])
+    layout = {"title": "Comparaison des différentes valeurs de K", 
+              "xaxis": {"title": "Valeur de K", }, 
+              "yaxis": {"title": "Précision (%)"}}
+
+    # Graphique du meilleur K
+    fig = Figure(data=data, layout=layout)
+    py.plot(fig, filename='basic_dot-plot')
+
+print("")
+print("Prédictions ...")
+print("-------------------------------------")
+
+# ÉVALUATION DU DATASET DE TEST
 predictions = []
 
-# Parcourir evalSet
 for x in range(len(evalSet)):
   voisins = plusProchesVoisins(dataset, evalSet[x], k)
   prediction = getPrediction(voisins)
   predictions.insert(len(predictions), prediction)
   
-  print(' Prédiction = ' + repr(prediction) + ', Valeur = ' + repr(evalSet[x][-1]))
-  
-accuracy = evalPrecision(evalSet, predictions)
+  print(' Prédiction = ' + repr(prediction))
 print("-------------------------------------")
-print(' ACCURACY  = ' + repr(accuracy) + '%')
